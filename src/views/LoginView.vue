@@ -83,7 +83,7 @@ const iniciarSesion = async () => {
 
   if (success) {
     toast.success('Bienvenido ' + username.value + '!')
-    router.push('/home')
+    router.push('/Main')
   } else {
     toast.error(authStore.error)
   }
