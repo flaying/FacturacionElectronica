@@ -14,7 +14,7 @@
         <RouterLink
           to="/Dashboard"
           class="nav-link"
-          :class="{ active: isActive('/') }"
+          :class="{ active: isActive('/Dashboard') }"
         >
           <i class="bi bi-speedometer2 me-2"></i> Dashboard
         </RouterLink>
@@ -148,7 +148,7 @@
                 <RouterLink
                   to="/ConsumidorFinal"
                   class="nav-link"
-                  :class="{ active: isActive('/cards/basic') }"
+                  :class="{ active: isActive('/ConsumidorFinal') }"
                 >
                   Fact. Cons. Final sin cliente
                 </RouterLink>
@@ -158,7 +158,7 @@
                 <RouterLink
                   to="/ConsumidorFinal2"
                   class="nav-link"
-                  :class="{ active: isActive('/cards/basic') }"
+                  :class="{ active: isActive('/ConsumidorFinal2') }"
                 >
                   Fact. Cons. Final
                 </RouterLink>
@@ -168,7 +168,7 @@
                 <RouterLink
                   to="/CreditoFiscal"
                   class="nav-link"
-                  :class="{ active: isActive('/cards/basic') }"
+                  :class="{ active: isActive('/CreditoFiscal') }"
                 >
                   Fact. Cred. Fiscal
                 </RouterLink>
@@ -287,7 +287,7 @@
                 <RouterLink
                   to="/Clientes"
                   class="nav-link"
-                  :class="{ active: isActive('/cards/basic') }"
+                  :class="{ active: isActive('/Clientes') }"
                 >
                   Documentos  Hacienda
                 </RouterLink>
@@ -315,7 +315,7 @@
                 <RouterLink
                   to="/Clientes"
                   class="nav-link"
-                  :class="{ active: isActive('/cards/basic') }"
+                  :class="{ active: isActive('/Clientes') }"
                 >
                   Crédito fiscal
                 </RouterLink>
@@ -493,8 +493,8 @@ const isActive = (path) => route.path === path
 }
 
 .nav-link.active {
-  background-color: #e7f1ff;
-  color: #0d6efd;
+  background-color: #77adfa;
+  color: #ffffff;
   font-weight: 500;
 }
 

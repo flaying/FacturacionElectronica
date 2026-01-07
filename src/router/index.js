@@ -14,9 +14,10 @@ const router = createRouter({
      {
     path: '/main',
     component: MainView,
-    children: [     
-      { path: '/Clientes', component: () => import('../modules/Clientes/Views/ClientesView.vue') },
+    children: [  
+      {path: '',redirect: 'dashboard'},   
       { path: '/Dashboard', component: () => import('../modules/Dashboard/Views/DashboardView.vue') },
+      { path: '/Clientes', component: () => import('../modules/Clientes/Views/ClientesView.vue') },     
       { path: '/Productos', component: () => import('../modules/Productos/Views/ProductosView.vue') },
       { path: '/ConsumidorFinal', component: () => import('../modules/FacturaConsumidorFinal/Views/FacturaConsumidorFinalSinClienteView.vue') },
       { path: '/ConsumidorFinal2', component: () => import('../modules/FacturaConsumidorFinal/Views/FacturaConsumidorFinalView.vue') },
