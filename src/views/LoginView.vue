@@ -79,14 +79,13 @@ const iniciarSesion = async () => {
     toast.warning('Contrseña es requerida')
     return
   }
-  const success = await authStore.login(username.value, password.value)
+  const result = await authStore.login(username.value, password.value)
 
-  if (success) {
-    toast.success('Bienvenido ' + username.value + '!')
-    router.push('/Main')
-  } else {
-    toast.error(authStore.error)
-  }
+  if (result.ok) {
+  router.push('/Main')
+} else {
+  toast.error(result.message || 'Error al iniciar sesión')
+}
 }
 </script>
 

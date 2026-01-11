@@ -1,24 +1,4 @@
-<script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
 
-const showBell = ref(false)
-const showUser = ref(false)
-
-const closeAll = (e) => {
-  if (!e.target.closest('.dropdown')) {
-    showBell.value = false
-    showUser.value = false
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', closeAll)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('click', closeAll)
-})
-</script>
 
 <template>
   <nav class="navbar navbar-light bg-white border-bottom px-4">
@@ -43,7 +23,7 @@ onBeforeUnmount(() => {
          
             <div class="dropdown-divider"></div>
 
-            <a class="dropdown-item" href="#">
+            <a class="dropdown-item" href="#" @click.prevent="cerrarSesion">
               <i class="bi bi-lock text-muted me-2"></i> Salir
             </a>
           </li>
@@ -53,6 +33,36 @@ onBeforeUnmount(() => {
     </div>
   </nav>
 </template>
+
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth/auth'
+const showBell = ref(false);
+const showUser = ref(false);
+const router = useRouter();
+const authStore = useAuthStore();
+
+const closeAll = (e) => {
+  if (!e.target.closest('.dropdown')) {
+    showBell.value = false
+    showUser.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', closeAll)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeAll)
+})
+
+const cerrarSesion = () => {
+  authStore.logout()   
+  router.push('/')     
+}
+</script>
 
 <style scoped>
 .cursor-pointer {
