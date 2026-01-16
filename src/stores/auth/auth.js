@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '@/services/urlAxiosAPI'
 
 export const useAuthStore = defineStore('auth', () => {
 
@@ -12,8 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const login = async (userName, passWord) => {
   try {
-    const response = await axios.post(
-      'https://localhost:7158/api/Login/Login',
+    const response = await api.post('/api/Login/Login',
       {
         user: userName,
         passWord: passWord,
@@ -31,15 +30,22 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
 
-
-     
-    localStorage.setItem('id', data[0].id)
-    localStorage.setItem('user_name', data[0].user_name)
-    localStorage.setItem('full_name', data[0].full_name)
-    localStorage.setItem('id_rol', data[0].id_rol)
-
-
-  
+    localStorage.setItem('id', data[0].id);
+    localStorage.setItem('user_name', data[0].user_name);
+    localStorage.setItem('full_name', data[0].full_name);
+    localStorage.setItem('id_rol', data[0].id_rol);
+    localStorage.setItem('conexionString', data[0].conexionString);
+    localStorage.setItem('emisor_ID_Local', data[0].emisor_ID_Local);
+    localStorage.setItem('emisor_ID_Caja', data[0].emisor_ID_Caja);
+    localStorage.setItem('codigoEmpresa', data[0].codigoEmpresa);
+    localStorage.setItem('NumDocumento', data[0].NumDocumento);
+    localStorage.setItem('NRC', data[0].NRC);
+    localStorage.setItem('PrimerPago', data[0].PrimerPago);
+    localStorage.setItem('ID_Plan', data[0].ID_Plan);
+    localStorage.setItem('Descripcion_plan', data[0].Descripcion_plan);
+    localStorage.setItem('Cantidad', data[0].Cantidad);
+    localStorage.setItem('Monto', data[0].Monto);
+    localStorage.setItem('MontoExtra', data[0].MontoExtra);
     return {
       ok: true,
       data
