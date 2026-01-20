@@ -30,6 +30,13 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
 
+  if ( data[0].id==-1) {
+      return {
+        ok: false,
+        message: 'No se puedo obtener la información del usuario'
+      }
+    }
+
     localStorage.setItem('id', data[0].id);
     localStorage.setItem('user_name', data[0].user_name);
     localStorage.setItem('full_name', data[0].full_name);

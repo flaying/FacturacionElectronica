@@ -5,7 +5,7 @@
     
     <div class="ms-auto d-flex align-items-center gap-3">
 
-      <!-- 👤 USUARIO -->
+      <!--  USUARIO -->
       <div class="dropdown position-relative">
         <i
             class="bi bi-person-circle fs-5 dropdown-toggle cursor-pointer"

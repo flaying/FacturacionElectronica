@@ -2,15 +2,16 @@
   <div class="card shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">Lista Clientes</h5>
-      <button class="btn btn-primary">
+      <button class="btn btn-primary"  @click="abrirModal">
         <i class="bi bi-plus-lg"></i> Agregar
       </button>
     </div>
     <div class="card-body">
       <!-- DataTable se encarga de todo -->
-      <DataTable :options="options" class="table table-striped table-bordered align-middle" />
+      <DataTable :options="options" class="table table-striped table-bordered align-middle"  responsiveLayout="stack"  breakpoint="960px"/>
     </div>
   </div>
+  <ClienteModal />
 </template>
 
 <script setup>
@@ -24,8 +25,24 @@ import DataTablesResponsive from 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css'
 import 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css'
 
+import ClienteModal from '@/modules/Clientes/Views/ClienteModal.vue'
+import { Modal } from 'bootstrap'
+
 DataTable.use(DataTablesCore)
 DataTable.use(DataTablesResponsive)
+
+// Iinstancia para abrir modal
+const abrirModal = () => {
+  const modal = new Modal(document.getElementById('clienteModal'), {
+    backdrop: 'static',  
+    keyboard: false     
+  })
+  modal.show();
+
+
+}
+
+
 // Instanciamos el store
 const clientesStore = useClientesStore()
 
@@ -134,6 +151,8 @@ const options = {
    },
   
 }
+
+
 </script>
 
 <style scoped>

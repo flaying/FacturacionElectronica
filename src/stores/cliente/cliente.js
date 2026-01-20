@@ -47,10 +47,58 @@ export const useClientesStore = defineStore('clientes', () => {
     }
   }
 
+
+    const GuardarCliente = async (datos) => {
+    loading.value = true
+
+    // Construir payload según lo que espera el backend
+    const data = {
+      id :datos.id,
+      nombre :datos.nombre,
+      numDocumento :datos.documento,
+      nrc  :datos.nrc,
+      departamento :datos.departamento.id_departament,
+      municipio :datos.municipio.id_municipality,
+      telefono :datos.telefono  ,
+      correoElectronico :datos.email,
+      giro :String(datos.giro.code_activity),
+      direccion :datos.direccion,
+      idDepto :'-1',
+      idMuni :'-1', 
+      idGiro :'-1',
+      retencion :datos.retencion  ? 1 : 0,
+      percepcion :0,
+      usuario :localStorage.getItem('id'),
+      conexionString : localStorage.getItem('conexionString'),
+      
+      
+    }
+    console.log(data);
+    try {
+      const response = await api.post('/api/Clientes/Cliente', data)
+
+      // Backend debe devolver algo como { draw, recordsTotal, recordsFiltered, data }
+      clientes.value = response.data.data || []
+      totalRecords.value = response.data.recordsTotal || 0
+
+      loading.value = false
+
+      return response.data
+
+    } catch (error) {
+      console.error('Error al guarddar el cliente:', error.response?.data || error.message)
+      loading.value = false
+      return {   
+        data: []
+      }
+    }
+  }
+
   return {
     clientes,
     totalRecords,
     loading,
-    getClientes
+    getClientes,
+    GuardarCliente
   }
 })
