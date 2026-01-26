@@ -1,104 +1,159 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import api from '@/services/urlAxiosAPI'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import api from "@/services/urlAxiosAPI";
 
-export const useClientesStore = defineStore('clientes', () => {
+export const useClientesStore = defineStore("clientes", () => {
+  const clientes = ref([]);
+  const totalRecords = ref(0);
+  const loading = ref(false);
 
-  const clientes = ref([])       // para guardar los datos
-  const totalRecords = ref(0)    // total de registros (DataTable)
-  const loading = ref(false)
+  //  NUEVO
+  const tableInstance = ref(null);
 
-  /**
-   * Función para obtener clientes desde el backend
-   * @param {object} dataTableParams - parámetros que manda DataTable
-   */
+  //  EDITAR
+  const clienteEditar = ref(null);
+
+  const setTableInstance = (dt) => {
+    tableInstance.value = dt;
+  };
+
+  const refrescarTabla = () => {
+    tableInstance.value?.ajax.reload(null, false);
+  };
+
+  const setClienteEditar = (cliente) => {
+    clienteEditar.value = cliente;
+  };
+
+  const limpiarClienteEditar = () => {
+    clienteEditar.value = null;
+  };
+
+  // ======================
+  // LISTAR CLIENTES
+  // ======================
   const getClientes = async (dataTableParams) => {
-    loading.value = true
+    loading.value = true;
 
-    // Construir payload según lo que espera el backend
     const payload = {
       draw: dataTableParams.draw,
       start: dataTableParams.start,
       length: dataTableParams.length,
-      searchValue: dataTableParams.search?.value || '',
-      conexion: localStorage.getItem('conexionString') // asegurarse de que exista
-    }
-    console.log(payload);
+      searchValue: dataTableParams.search?.value || "",
+      conexion: localStorage.getItem("conexionString"),
+    };
+
     try {
-      const response = await api.post('/api/Clientes/ListaClientes', payload)
+      const response = await api.post("/api/Clientes/ListaClientes", payload);
 
-      // Backend debe devolver algo como { draw, recordsTotal, recordsFiltered, data }
-      clientes.value = response.data.data || []
-      totalRecords.value = response.data.recordsTotal || 0
+      clientes.value = response.data.data || [];
+      totalRecords.value = response.data.recordsTotal || 0;
 
-      loading.value = false
-
-      return response.data
-
+      return response.data;
     } catch (error) {
-      console.error('Error al obtener clientes:', error.response?.data || error.message)
-      loading.value = false
+      console.error("Error al obtener clientes:", error);
       return {
-        draw: payload.Draw,
+        draw: payload.draw,
         recordsTotal: 0,
         recordsFiltered: 0,
-        data: []
-      }
+        data: [],
+      };
+    } finally {
+      loading.value = false;
     }
-  }
+  };
 
+  // ======================
+  // GUARDAR / EDITAR
+  // ======================
+  const GuardarCliente = async (datos) => {
+    loading.value = true;
 
-    const GuardarCliente = async (datos) => {
-    loading.value = true
-
-    // Construir payload según lo que espera el backend
     const data = {
-      id :datos.id,
-      nombre :datos.nombre,
-      numDocumento :datos.documento,
-      nrc  :datos.nrc,
-      departamento :datos.departamento.id_departament,
-      municipio :datos.municipio.id_municipality,
-      telefono :datos.telefono  ,
-      correoElectronico :datos.email,
-      giro :String(datos.giro.code_activity),
-      direccion :datos.direccion,
-      idDepto :'-1',
-      idMuni :'-1', 
-      idGiro :'-1',
-      retencion :datos.retencion  ? 1 : 0,
-      percepcion :0,
-      usuario :localStorage.getItem('id'),
-      conexionString : localStorage.getItem('conexionString'),
-      
-      
-    }
-    console.log(data);
+      id: datos.id,
+      nombre: datos.nombre,
+      numDocumento: datos.documento,
+      nrc: datos.nrc,
+      departamento: datos.departamento.id_departament,
+      municipio: datos.municipio.id_municipality,
+      telefono: datos.telefono,
+      correoElectronico: datos.email,
+      giro: String(datos.giro.code_activity),
+      direccion: datos.direccion,
+      idDepto: "-1",
+      idMuni: "-1",
+      idGiro: "-1",
+      retencion: datos.retencion ? 1 : 0,
+      percepcion: 0,
+      usuario: localStorage.getItem("id"),
+      conexionString: localStorage.getItem("conexionString"),
+    };
+
     try {
-      const response = await api.post('/api/Clientes/Cliente', data)
+      const response = await api.post("/api/Clientes/Cliente", data);
+      const resp = response.data?.[0]?.resp;
 
-      // Backend debe devolver algo como { draw, recordsTotal, recordsFiltered, data }
-      clientes.value = response.data.data || []
-      totalRecords.value = response.data.recordsTotal || 0
+      if (resp === 1) {
+        refrescarTabla();
+        limpiarClienteEditar();
 
-      loading.value = false
-
-      return response.data
-
-    } catch (error) {
-      console.error('Error al guarddar el cliente:', error.response?.data || error.message)
-      loading.value = false
-      return {   
-        data: []
+        return {
+          ok: true,
+          mensaje: "Guardado con éxito",
+        };
       }
+
+      return {
+        ok: false,
+        mensaje: "Error al guardar el cliente",
+      };
+    } catch (error) {
+      console.error("Error al guardar el cliente:", error);
+      return {
+        ok: false,
+        mensaje: "Error de servidor",
+      };
+    } finally {
+      loading.value = false;
     }
-  }
+  };
+
+  // ======================
+  // ELIMINAR
+  // ======================
+  const eliminarCliente = async (id) => {
+    if (!id) return { ok: false, mensaje: "ID inválido" };
+
+    try {
+      const response = await api.post("/api/Clientes/EliminarCliente", {
+        id: id,
+        conexionString: localStorage.getItem("conexionString"),
+      });
+
+      const resp = response.data?.[0]?.resp;
+      if (resp === 1) {
+        refrescarTabla();
+        return { ok: true, mensaje: "Cliente eliminado correctamente" };
+      } else {
+        return { ok: false, mensaje: "No se pudo eliminar el cliente" };
+      }
+    } catch (error) {
+      console.error("Error al eliminar cliente:", error.response?.data || error.message);
+      return { ok: false, mensaje: "Error al eliminar cliente" };
+    }
+  };
 
   return {
     clientes,
     totalRecords,
     loading,
+    clienteEditar,
     getClientes,
-    GuardarCliente
-  }
-})
+    GuardarCliente,
+    setClienteEditar,
+    limpiarClienteEditar,
+    setTableInstance,
+    refrescarTabla,
+    eliminarCliente,
+  };
+});

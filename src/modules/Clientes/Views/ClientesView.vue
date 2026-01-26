@@ -8,7 +8,7 @@
     </div>
     <div class="card-body">
       <!-- DataTable se encarga de todo -->
-      <DataTable :options="options" class="table table-striped table-bordered align-middle"  responsiveLayout="stack"  breakpoint="960px"/>
+      <DataTable  ref="dtRef" :options="options" class="table table-striped table-bordered align-middle"  responsiveLayout="stack"  breakpoint="960px"/>
     </div>
   </div>
   <ClienteModal />
@@ -27,9 +27,16 @@ import 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css'
 
 import ClienteModal from '@/modules/Clientes/Views/ClienteModal.vue'
 import { Modal } from 'bootstrap'
-
+import { ref, onMounted } from "vue";
+//import { toast } from "vue3-toastify";
+import Swal from 'sweetalert2'
+const dtRef = ref(null);
 DataTable.use(DataTablesCore)
 DataTable.use(DataTablesResponsive)
+
+onMounted(() => {
+  clientesStore.setTableInstance(dtRef.value.dt);
+});
 
 // Iinstancia para abrir modal
 const abrirModal = () => {
@@ -38,7 +45,6 @@ const abrirModal = () => {
     keyboard: false     
   })
   modal.show();
-
 
 }
 
@@ -149,9 +155,102 @@ const options = {
        }
 
    },
-  
+  createdRow: (row, data) => {
+  row.querySelector('.edit-btn')?.addEventListener('click', () => {
+    editarCliente(data)
+  })
+   
+},
+ 
 }
 
+
+
+const editarCliente = (cliente) => {
+  clientesStore.setClienteEditar(cliente)
+
+  const modal = new Modal(document.getElementById('clienteModal'), {
+    backdrop: 'static',
+    keyboard: false
+  })
+  modal.show()
+}
+onMounted(() => {
+  // Delegación de eventos para eliminar
+  const table = document.querySelector('.dataTable')
+  table.addEventListener('click', async (e) => {
+    // Detecta click en botón eliminar
+    const deleteBtn = e.target.closest('.delete-btn')
+    if (deleteBtn) {
+      const row = deleteBtn.closest('tr')
+      if (!row) return
+
+      const cells = row.querySelectorAll('td')
+      const id = cells[0]?.innerText
+      const nombre = cells[1]?.innerText
+      if (!id || !nombre) return
+
+      // Llama a SweetAlert2
+      confirmarEliminar(id, nombre)
+    }
+  })
+})
+
+/* onMounted(() => {
+  const table = document.querySelector('.dataTable') 
+  table.addEventListener('click', async (e) => {
+    if (e.target.closest('.delete-btn')) {
+      const row = e.target.closest('tr')
+      if (!row) return
+
+      // Capturar ID y Nombre del cliente
+      const cells = row.querySelectorAll('td')
+      const id = cells[0]?.innerText  
+      const nombre = cells[1]?.innerText 
+
+      if (!id) return
+
+  
+      const confirmar = confirm(`¿Desea eliminar al cliente "${nombre}"?`)
+      if (!confirmar) return
+
+      // Llamar a la store
+      const result = await clientesStore.eliminarCliente(id)
+
+      if (result.ok) {
+        toast.success(result.mensaje)
+        // Recargar DataTable
+        const dt = DataTable.DataTable(table) 
+        dt.ajax.reload(null, false) 
+      } else {
+        toast.error(result.mensaje)
+      }
+    }
+  })
+}) */
+
+const confirmarEliminar = async (id, nombre) => {
+  const result = await Swal.fire({
+    title: `¿Eliminar al cliente "${nombre}"?`,
+    text: "Esta acción no se puede deshacer",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',  // texto del botón de confirmar
+    cancelButtonText: 'Cancelar',       // texto del botón de cancelar
+    reverseButtons: true                // opcional: invierte los botones para estilo común en español
+  })
+
+  if (result.isConfirmed) {
+    const res = await clientesStore.eliminarCliente(id)
+    if (res.ok) {
+      Swal.fire('Eliminado!', `Cliente "${nombre}" eliminado correctamente`, 'success')
+      const dt = DataTable.DataTable(document.querySelector('.dataTable'))
+      dt.ajax.reload(null, false)
+    } else {
+      Swal.fire('Error', res.mensaje, 'error')
+    }
+  }
+}
 
 </script>
 
