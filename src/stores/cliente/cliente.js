@@ -7,6 +7,9 @@ export const useClientesStore = defineStore("clientes", () => {
   const totalRecords = ref(0);
   const loading = ref(false);
 
+const clientes2 = ref([]);
+
+
   //  NUEVO
   const tableInstance = ref(null);
 
@@ -143,8 +146,29 @@ export const useClientesStore = defineStore("clientes", () => {
     }
   };
 
+ const obtenerClientes = async () => {
+    loading.value = true
+    try {
+      const response = await api.post('/api/Clientes/ObtenerClientes',{id:0,conexionString:localStorage.getItem("conexionString")})
+
+  //Siempre revisar como viene el json para poder obtener los datos correctamente
+       clientes2.value = (response.data || []).map(cl => ({
+        id: cl.id,
+        nombre: cl.nombre
+      }))
+
+      loading.value = false
+      return clientes2.value
+    } catch (error) {
+      console.error('Error al obtener clientes:', error.response?.data || error.message)
+      loading.value = false
+      return []
+    }
+  }
+
   return {
     clientes,
+    clientes2,
     totalRecords,
     loading,
     clienteEditar,
@@ -155,5 +179,6 @@ export const useClientesStore = defineStore("clientes", () => {
     setTableInstance,
     refrescarTabla,
     eliminarCliente,
+    obtenerClientes
   };
 });
